@@ -1,6 +1,9 @@
 import { Formik, Field } from 'formik';
 import * as Yup from 'yup';
 import { ErrMessage, StyledForm } from './PhoneForm.styled';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact } from 'redux/contactsSlice';
+import { nanoid } from '@reduxjs/toolkit';
 
 const quizSchema = Yup.object().shape({
     name: Yup.string().min(3, 'Too short!').required('This field is required!'),
@@ -10,7 +13,20 @@ const quizSchema = Yup.object().shape({
         .required('This field is required!'),
 });
 
-export const PhoneForm = ({ onAddPhone }) => {
+export const PhoneForm = () => {
+
+    const dispatch = useDispatch();
+    const contacts = useSelector(state => state.contacts.contacts)
+
+    const onAddPhone = newPhone => {
+        if (contacts.find(contact => contact.name === newPhone.name)) {
+            alert(`${newPhone.name} is Olredy in contacts`)
+        }
+        else {
+            dispatch(addContact({ ...newPhone, id: nanoid() }))
+        }
+    };
+
     return (
         <div>
             <h2>Phonebook</h2>
@@ -22,7 +38,6 @@ export const PhoneForm = ({ onAddPhone }) => {
                 }}
                 validationSchema={quizSchema}
                 onSubmit={(values, actions) => {
-                    console.log(values);
                     onAddPhone(values);
                     actions.resetForm();
                 }}

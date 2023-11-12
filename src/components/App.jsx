@@ -1,55 +1,21 @@
-import { useEffect, useState } from 'react';
-import { nanoid } from 'nanoid';
+import { useEffect } from 'react';
 import { PhoneForm } from './PhoneForm/PhoneForm';
 import { Contacts } from './Contacts/Contacts';
-
-const getContacts = () => {
-  const savedContacts = localStorage.getItem('saved-contacts');
-  if (savedContacts !== null) {
-    console.log(JSON.parse(savedContacts));
-    return JSON.parse(savedContacts);
-  } else {
-    return [];
-  }
-
-}
+import { useSelector } from 'react-redux';
 
 export const App = () => {
-  const [contacts, setContacts] = useState(getContacts);
-  const [filter, setFilter] = useState("");
+
+  const contacts = useSelector(state => state.contacts.contacts)
+  const filter = useSelector(state => state.filter.filter);
 
   useEffect(() => {
-    console.log('+');
     localStorage.setItem('saved-contacts', JSON.stringify(contacts));
   }, [contacts])
 
-  const addPhone = newPhone => {
-    console.log('2');
-    if (contacts.find(contact => contact.name === newPhone.name)) {
-      alert(`${newPhone.name} is Olredy in contacts`)
-    }
-    else {
-      setContacts(prevState => ([
-        ...prevState,
-        { ...newPhone, id: nanoid() }
-      ]))
-    }
-  };
-
-  const deletePhone = PhoneId => {
-    setContacts(prevState => (prevState.filter(contact => contact.id !== PhoneId)))
-  };
-
-  const changeFilter = value => {
-    setFilter(value);
-  };
-
-  const newContacts = contacts.filter(contact => contact.name.toLowerCase().includes(filter.toLowerCase()));
-
   return (
     <div>
-      <PhoneForm onAddPhone={addPhone} />
-      <Contacts contacts={newContacts} onDelete={deletePhone} filter={filter} onChange={changeFilter}></Contacts>
+      <PhoneForm />
+      <Contacts></Contacts>
     </div>
   );
 }
